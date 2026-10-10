@@ -25,6 +25,7 @@ jobs:
           for file in *.mjs public/*.js scripts/*.mjs; do node --check "$file"; done
           bash -n deploy/activate.sh
       - run: docker build -t cvwide-ci .
+      - run: docker run --rm --entrypoint sh cvwide-ci -c 'test -s /etc/ssl/certs/ca-certificates.crt'
   deploy:
     needs: test
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
