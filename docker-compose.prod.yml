@@ -8,6 +8,8 @@ services:
     env_file: /srv/worksquad/projects/cvwide/secrets/app.env
     volumes:
       - /srv/worksquad/projects/cvwide/data:/data
+      - /srv/worksquad/projects/cvwide/data:/app/data:ro
+      - /srv/worksquad/projects/cvwide/workspace/output:/app/output:ro
       - ./runtime-assets:/app/public/assets:ro
       - /srv/worksquad/projects/cvwide/seed.json:/app/public/data/seed.json:ro
       - /home/maratik/.local/bin/codex:/usr/local/bin/codex:ro

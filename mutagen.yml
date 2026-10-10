@@ -9,5 +9,8 @@ sync:
     alpha: worksquad:/srv/worksquad/projects/cvwide/data
     beta: ./data
     mode: one-way-replica
+    permissions:
+      defaultFileMode: "0600"
+      defaultDirectoryMode: "0700"
     ignore:
       paths: ["*.tmp"]

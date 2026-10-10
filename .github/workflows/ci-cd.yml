@@ -28,7 +28,7 @@ jobs:
       - run: docker run --rm --entrypoint sh cvwide-ci -c 'test -s /etc/ssl/certs/ca-certificates.crt'
   deploy:
     needs: test
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    if: vars.CVWIDE_DEPLOY_ENABLED == 'true' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -50,5 +50,4 @@ jobs:
           RELEASE: ${{ github.sha }}
         run: |
           git archive --format=tar.gz --output="/tmp/cvwide-$RELEASE.tar.gz" "$RELEASE"
-          scp "/tmp/cvwide-$RELEASE.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:/tmp/cvwide-$RELEASE.tar.gz"
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" "sudo bash -s -- '$RELEASE'" < deploy/activate.sh
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "cvwide-deploy $RELEASE" < "/tmp/cvwide-$RELEASE.tar.gz"

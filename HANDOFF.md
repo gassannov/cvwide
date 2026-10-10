@@ -2,7 +2,11 @@
 
 Requested: Worksquad permanent runtime, `https://maratik.fun/cvwide/`, exact 26lockinnotes password UI and secret, private GitHub repository, code sync with Mutagen, shared server database usable from both interfaces, server Codex. No offline writes or scheduled backup service. Implementation: password access gate and prefix routing, Node 22 Docker runtime, guarded CI/CD with rollback, SSH local proxy, two one-way synchronization sessions. All original personal files retained outside Git. Existing chat transcripts are kept; imported local thread IDs are historical and not resumed on the server.
 
-Verification and live release checkpoint follow below when deployment is complete.
+Verified live at /cvwide/: desktop and mobile login screenshots match 26lockinnotes exactly; password required after refresh; private unauthenticated API returns 401; dashboard, applications and authenticated PDF load; mobile chat composer/history visible; no browser errors. Real Codex in the Node 22 container replied “В текущей базе 66 вакансий.” Server standalone CLI is 0.162.1, not the older /usr/local binary. Local SSH interface reads the same revision 114 and a no-op PATCH returns 200 without incrementing revision. Initial 66-job tracking state remains unchanged. Two Mutagen sessions are active; local SSH proxy has a LaunchAgent.
+
+Automatic deployment is intentionally gated by CVWIDE_DEPLOY_ENABLED until explicit permission to add the dedicated forced-command SSH key. Existing encrypted SSH key failed in GitHub Actions; the site was activated through existing authenticated SSH. Proposed public key fingerprint: SHA256:Hs84Z7opED8x+LH2Jzichl8SZMIRodrhdJpwXiIbDLY. Proposed entry deploy/ci-entry.sh accepts only cvwide-deploy <40-hex SHA>, consumes archive on stdin and runs root-owned /usr/local/libexec/cvwide-activate. No new key has been authorized on the server. After permission: install reviewed scripts root-owned, append restrict,command=... public key to authorized_keys, set the dedicated CI private key secret, enable the repository variable, and verify a complete CI/CD run.
+
+A CI restart check exposed completion-before-persistence publication in chat GET; GET now shares the write queue. Initial rollout also exposed a missing-current readlink trap and a reload/public-route race; activation verifies an existing prior target, retries public checks, keeps versioned images and restores routing on failure. Final local/CI verification and release SHA are recorded in the migration checkpoint.
 
 # Handoff — 10 October 2026
 
