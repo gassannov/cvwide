@@ -1,5 +1,6 @@
 services:
   app:
+    image: cvwide:${CVWIDE_RELEASE:-local}
     build: .
     restart: unless-stopped
     init: true
@@ -7,7 +8,7 @@ services:
     env_file: /srv/worksquad/projects/cvwide/secrets/app.env
     volumes:
       - /srv/worksquad/projects/cvwide/data:/data
-      - /srv/worksquad/projects/cvwide/private-assets:/app/public/assets:ro
+      - ./runtime-assets:/app/public/assets:ro
       - /srv/worksquad/projects/cvwide/seed.json:/app/public/data/seed.json:ro
       - /home/maratik/.local/bin/codex:/usr/local/bin/codex:ro
       - /home/maratik/.codex:/home/maratik/.codex

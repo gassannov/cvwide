@@ -12,18 +12,23 @@ rm -f "/tmp/cvwide-$release.tar.gz"
 test -r "$app_root/secrets/app.env"
 test -s "$app_root/data/state.json"
 test -s "$app_root/seed.json"
+mkdir -p "$release_dir/runtime-assets"
+cp -a "$app_root/private-assets/." "$release_dir/runtime-assets/"
+cp -a "$release_dir/public/assets/." "$release_dir/runtime-assets/"
 previous=''
 if [ -L "$app_root/current" ] && [ -f "$app_root/current/docker-compose.prod.yml" ]; then
  previous=$(readlink -f "$app_root/current")
 fi
 previous_fragment=$(readlink /etc/nginx/cvwide-maratik.conf || true)
-compose(){ docker compose -f "$1/docker-compose.prod.yml" -p cvwide "${@:2}"; }
+compose(){ CVWIDE_RELEASE=$(basename "$1") docker compose -f "$1/docker-compose.prod.yml" -p cvwide "${@:2}"; }
 rollback(){
  if [ -n "$previous" ] && [ -f "$previous/docker-compose.prod.yml" ]; then
   ln -sTfn "$previous" "$app_root/current"
-  compose "$previous" up -d --build
+  if ! compose "$previous" up -d --no-build; then
+   echo 'Previous service could not restart; restoring routing as far as possible' >&2
+  fi
  else
-  compose "$release_dir" down
+  compose "$release_dir" down || true
   rm -f "$app_root/current"
  fi
  if [ -n "$previous_fragment" ]; then

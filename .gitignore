@@ -4,6 +4,7 @@ node_modules/
 /.local/
 .DS_Store
 *.bak
+/runtime-assets/
 public/data/seed.json
 public/assets/*
 !public/assets/fonts/

@@ -4,6 +4,7 @@ output
 .local
 node_modules
 *.bak
+runtime-assets
 public/data/seed.json
 public/assets/*.pdf
 public/assets/*.html

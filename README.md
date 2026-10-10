@@ -2,7 +2,7 @@
 
 Production is `https://maratik.fun/cvwide/`, on the Worksquad SSH host. Its password and login screen match 26lockinnotes. Opening or refreshing the workspace shows the password screen again. All APIs, CVs, reports, source snapshots and transcripts require authentication. The app binds to loopback only.
 
-The production service is Docker Compose project `cvwide`, Node.js 22, port `127.0.0.1:4312`. Root: `/srv/worksquad/projects/cvwide`; tested GitHub `main` commits become immutable `releases/<sha>`, selected by `current`. Persistent state is in `data/`; assets and seed come from the synchronized workspace. Credentials stay in root-readable `secrets/app.env` and the existing server account's Codex storage. No credentials are copied into Git or the browser.
+The production service is Docker Compose project `cvwide`, Node.js 22, port `127.0.0.1:4312`. Root: `/srv/worksquad/projects/cvwide`; tested GitHub `main` commits become immutable `releases/<sha>`, selected by `current`. Persistent state is in `data/`; private assets are combined with tracked fonts/icons/CSS into each immutable release; seed comes from the synchronized workspace. Credentials stay in root-readable `secrets/app.env` and the existing server account's Codex storage. No credentials are copied into Git or the browser.
 
 On this Mac, `npm start` uses `.local/remote.json` to open an SSH connection and serve `http://localhost:4311/cvwide/`. A LaunchAgent keeps that connection available after login and reconnects after network failure. It never falls back to a separate writable local database. Without `.local/remote.json`, development still runs the standalone local server.
 
