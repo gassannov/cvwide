@@ -5,6 +5,7 @@ import {mkdtemp,rm} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
+import vm from 'node:vm';
 test('password protects every private route, prefix assets work and revisions remain enforced',async()=>{
  const dir=await mkdtemp(path.join(os.tmpdir(),'cvwide-access-'));
  const child=spawn(process.execPath,['server.mjs'],{env:{...process.env,PORT:'0',CVWIDE_DATA_DIR:dir,NOTES_PASSWORD:'1234',CVWIDE_BASE_PATH:'/cvwide',CVWIDE_PUBLIC_ORIGIN:'https://maratik.fun'},stdio:['ignore','pipe','pipe']});
@@ -22,6 +23,14 @@ test('password protects every private route, prefix assets work and revisions re
   const state=await(await fetch(prefix+'/api/state',{headers:auth})).json();
   const page=await(await fetch(prefix+'/workspace',{headers:auth})).text();assert.match(page,/\/cvwide\/app.js/);
   const app=await(await fetch(prefix+'/app.js',{headers:auth})).text();assert.match(app,/const workspacePrefix='\/cvwide'/);assert.match(app,/fetch\('\/cvwide\/api\/state'/);
+  const handlers={},form={addEventListener:(name,fn)=>handlers[name]=fn},input={value:'1234',addEventListener(){},focus(){}},error={textContent:''},slots=Array.from({length:4},()=>({classList:{toggle(){}}}));
+  let written='',sessionCookie;
+  const context=vm.createContext({document:{querySelector:s=>s==='[data-password-form]'?form:s==='#password'?input:error,querySelectorAll:()=>slots,open(){},write:html=>written=html,close(){}},fetch:async(url,options={})=>{
+   const result=await fetch(base+url,{...options,headers:{...options.headers,Origin:base,...(sessionCookie?{Cookie:sessionCookie}:{})}});
+   if(result.headers.get('set-cookie'))sessionCookie=result.headers.get('set-cookie').split(';')[0];return result;
+  }});
+  new vm.Script(await(await fetch(prefix+'/login.js')).text()).runInContext(context);
+  await handlers.submit({preventDefault(){}});assert.match(written,/Career copilot/);assert.equal(error.textContent,'');
   assert.equal((await fetch(prefix+'/api/jobs/'+state.jobs[0].id,{method:'PATCH',headers:{...headers,...auth},body:JSON.stringify({revision:state.revision-1,notes:'stale'})})).status,409);
   const publicWrite=await new Promise((resolve,reject)=>{const req=http.request(prefix+'/api/session',{method:'POST',headers:{Host:'maratik.fun','Content-Type':'application/json'}},res=>{res.resume();resolve(res.statusCode);});req.on('error',reject);req.end('{"password":"1234"}');});assert.equal(publicWrite,403);
   const wrong=await fetch(prefix+'/api/session',{method:'POST',headers,body:'{"password":"0000"}'});assert.equal(wrong.status,401);

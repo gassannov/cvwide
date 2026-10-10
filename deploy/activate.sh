@@ -12,7 +12,10 @@ rm -f "/tmp/cvwide-$release.tar.gz"
 test -r "$app_root/secrets/app.env"
 test -s "$app_root/data/state.json"
 test -s "$app_root/seed.json"
-previous=$(readlink -f "$app_root/current" || true)
+previous=''
+if [ -L "$app_root/current" ] && [ -f "$app_root/current/docker-compose.prod.yml" ]; then
+ previous=$(readlink -f "$app_root/current")
+fi
 previous_fragment=$(readlink /etc/nginx/cvwide-maratik.conf || true)
 compose(){ docker compose -f "$1/docker-compose.prod.yml" -p cvwide "${@:2}"; }
 rollback(){
@@ -21,6 +24,7 @@ rollback(){
   compose "$previous" up -d --build
  else
   compose "$release_dir" down
+  rm -f "$app_root/current"
  fi
  if [ -n "$previous_fragment" ]; then
   ln -sfn "$previous_fragment" /etc/nginx/cvwide-maratik.conf
@@ -43,7 +47,13 @@ ln -sTfn "$release_dir" "$app_root/current"
 ln -sfn "$app_root/current/nginx.conf" /etc/nginx/cvwide-maratik.conf
 nginx -t
 systemctl reload nginx
-curl -fsS https://maratik.fun/cvwide/ | grep -q password-slots
-[ "$(curl -sS -o /dev/null -w '%{http_code}' https://maratik.fun/cvwide/api/state)" = 401 ]
+public_ready=false
+for attempt in $(seq 1 15); do
+ if curl -fsS https://maratik.fun/cvwide/ | grep -q password-slots; then
+  if [ "$(curl -sS -o /dev/null -w '%{http_code}' https://maratik.fun/cvwide/api/state)" = 401 ]; then public_ready=true; break; fi
+ fi
+ sleep 1
+done
+[ "$public_ready" = true ]
 printf 'Activated cvwide %s\n' "$release"
 trap - ERR

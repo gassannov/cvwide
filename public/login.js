@@ -7,7 +7,7 @@ form.addEventListener('click',()=>input.focus());
 form.addEventListener('submit',async event=>{
  event.preventDefault();if(pending)return;pending=true;input.disabled=true;
  try{
-  const response=await fetch(workspacePrefix+'/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:input.value})});
+  const response=await fetch(workspacePrefix+'/'+'api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:input.value})});
   input.value='';render();
   if(!response.ok){error.textContent=response.status===401?'wrong password':'try again later';return;}
   const page=await fetch(workspacePrefix+'/workspace');if(!page.ok)throw Error('Could not open workspace');
