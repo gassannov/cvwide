@@ -17,7 +17,7 @@ export async function createChat({root,dataDir,getState}) {
  const restore=(target,previous)=>{for(const key of Object.keys(target))if(!Object.hasOwn(previous,key))delete target[key];Object.assign(target,previous);};
  const fail=(code,message)=>Object.assign(Error(message),{statusCode:code});
  async function handle(req,res,url,input,send) {
-  if(url.pathname==='/api/chat' && req.method==='GET'){send(res,200,{sessions:store.sessions});return;}
+  if(url.pathname==='/api/chat' && req.method==='GET')return serialized(()=>send(res,200,{sessions:store.sessions}));
   if(url.pathname==='/api/chat' && req.method==='POST')return serialized(async()=>{
    const s={id:randomUUID(),title:'New conversation',threadId:null,revision:0,status:'idle',messages:[],error:'',createdAt:new Date().toISOString()};store.sessions.unshift(s);try{await save();}catch(e){store.sessions.shift();throw e;}send(res,201,s);
   });
