@@ -24,7 +24,7 @@ Requires Node.js 22 or newer. The dashboard has no npm dependencies. Chat additi
 npm start
 ```
 
-Open http://localhost:4311. Use `PORT=4312 npm start` to choose another port. The server binds to `127.0.0.1` only; this app is intended for personal local use.
+Open http://localhost:4311. Use `PORT=4312 npm start` to choose another port. The server binds to `127.0.0.1` only. Without the local SSH configuration this starts standalone development; the configured Mac uses the shared server through SSH as described above.
 
 ## Interface
 
@@ -44,7 +44,7 @@ Activity is checkpointed once a second during a turn and saved at completion. In
 
 Every turn includes the complete latest workspace database: all application records, tracking notes and history, follow-up dates, prepared letters, bilingual career profile, contacts, assets and source provenance. Codex can also read project asset files. This is read-only assistance; edit application tracking in Applications. It does not submit applications or send messages to recruiters.
 
-Chat uses the local `codex exec --json` / `codex exec resume` interface and your existing Codex authentication. Workspace data is sent to OpenAI for answers; local-only hosting does not mean offline inference. The CLI runs with a read-only sandbox, approvals disabled (operations requiring approval fail), and user configuration excluded to avoid inheriting unrelated hooks or integrations. It uses the CLI default model; set `CVWIDE_CODEX_MODEL` to explicitly select a model, or `CVWIDE_CODEX_BIN=/absolute/path/to/codex` if Codex is not on the server's PATH. No credentials reach the browser. Integration reference: [official OpenAI non-interactive Codex documentation](https://learn.chatgpt.com/docs/non-interactive-mode).
+Chat uses `codex exec --json` / `codex exec resume` on the active server and its existing Codex authentication. Workspace data is sent to OpenAI for answers; local-only hosting does not mean offline inference. The CLI runs with a read-only sandbox, approvals disabled (operations requiring approval fail), and user configuration excluded to avoid inheriting unrelated hooks or integrations. It uses the CLI default model; set `CVWIDE_CODEX_MODEL` to explicitly select a model, or `CVWIDE_CODEX_BIN=/absolute/path/to/codex` if Codex is not on the server's PATH. No credentials reach the browser. Integration reference: [official OpenAI non-interactive Codex documentation](https://learn.chatgpt.com/docs/non-interactive-mode).
 
 Conversations and Codex thread IDs are saved separately in `data/chat.json` (or the selected `CVWIDE_DATA_DIR`) with atomic writes and a previous `chat.json.bak`. Existing tracking data needs no migration. Export backup exports tracking state only; retain `chat.json` separately to back up conversations. Codex's own session files remain in its local account storage and are required to resume saved thread IDs. Interrupted turns are marked on restart; send another message to continue. Turns time out after ten minutes. Errors appear in the chat and preserve the typed draft when sending fails.
 
@@ -60,7 +60,7 @@ Conversations and Codex thread IDs are saved separately in `data/chat.json` (or 
 
 Updates are written atomically to `data/state.json`, retaining the previous state as `data/state.json.bak`. Each edit includes the current revision; conflicting edits from another tab are rejected rather than overwritten. Reload the page to get the latest state after a conflict. `CVWIDE_DATA_DIR=/absolute/path npm start` moves writable state to another directory.
 
-To restore a backup, stop the server, retain a copy of the current `data/state.json`, place the exported JSON at `data/state.json`, then restart. There is no cloud sync, inbox integration or automatic submission. Follow-up dates are a planning list, not scheduled notifications. Collections can be imported through the local API; there is no upload form yet.
+To restore a backup, stop the server, retain a copy of the current `data/state.json`, place the exported JSON at `data/state.json`, then restart. There is no inbox integration or automatic submission. The configured server setup uses Mutagen and the shared SSH database described above. Follow-up dates are a planning list, not scheduled notifications. Collections can be imported through the local API; there is no upload form yet.
 
 ## Collection imports
 
@@ -131,7 +131,7 @@ The redesigned Applications table and an existing chat were visually inspected i
 
 `server.mjs` serves the app and tracking API. `chat.mjs` manages Codex sessions, streaming and transcript persistence. `public/app.js` renders chat and the four tracking views and detail dialog. `public/style.css` defines desktop/mobile layouts. `scripts/import_maratik.py` creates the reviewed seed and asset snapshots. `tests/server.test.mjs` contains tracking checks; `tests/chat.test.mjs` uses an isolated fake CLI for reproducible session and failure tests. Live verification also confirmed a real database-grounded reply and a follow-up using the same Codex thread. The redesigned desktop chat was visually inspected; mobile and dark-theme rendering remain unverified due to shared-browser activity.
 
-Tracking data and transcripts are stored locally; AI chat sends workspace context to OpenAI. Source reports contain personal contact information: this is not a public static-site bundle or deployment-ready multi-user service.
+Tracking data and transcripts remain private files on the active server, mirrored to the Mac; AI chat sends workspace context to OpenAI. Source reports contain personal contact information and are password-protected in server mode. This is a personal workspace.
 
 Application writing preference (user confirmed 10 Oct): emphasize supported achievements and role-relevant strengths. Do not volunteer missing experience, credentials, languages or other disadvantages in free-text answers. Answer mandatory factual eligibility questions truthfully; never fabricate qualifications. Later material revisions belong in the submission ledger, leaving the original prepared plan as a historical snapshot.
 
