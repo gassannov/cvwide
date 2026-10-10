@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#fafaf9">
+  <title>CV Wide — Career workspace</title>
+  <link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+<aside class="sidebar">
+  <a class="brand" href="#chat" aria-label="CV Wide home"><span class="brand-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="/assets/icons/lucide.svg#logo"/></svg></span><span>cv wide<span class="brand-dot">.</span></span></a>
+  <div class="workspace-switch"><span class="workspace-avatar">M</span><div><strong>Marat’s workspace</strong><small>Personal · Career</small></div><span class="workspace-lock" aria-label="Private workspace"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="/assets/icons/lucide.svg#lock"/></svg></span></div>
+  <div class="workspace-label">WORKSPACE</div>
+  <nav aria-label="Main navigation">
+    <a href="#chat" data-view="chat"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="/assets/icons/lucide.svg#spark"/></svg></span> Career copilot</a>
+    <a href="#applications" data-view="applications"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="/assets/icons/lucide.svg#briefcase"/></svg></span> Applications <b id="nav-count">—</b></a>
+    <a href="#followups" data-view="followups"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="/assets/icons/lucide.svg#clock"/></svg></span> Follow-ups <b id="due-count">—</b></a>
+    <a href="#assets" data-view="assets"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="/assets/icons/lucide.svg#file"/></svg></span> Career assets</a>
+    <a href="#profile" data-view="profile"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use href="/assets/icons/lucide.svg#user"/></svg></span> My profile</a>
+  </nav>
+  <div class="sidebar-bottom"><div class="local-badge"><i></i> Shared workspace <span>Private</span></div><div class="user"><span class="avatar">MG</span><div><strong>Marat Gasanov</strong><small>ML Engineer</small></div><button id="theme-toggle" class="icon-button" aria-label="Switch appearance"></button></div></div>
+</aside>
+<main><header class="topbar"><span>Workspace <span class="slash">/</span> <strong id="breadcrumb">Career copilot</strong></span><span id="save-state" role="status">Saved to workspace</span></header><div id="content" tabindex="-1"><div class="loading">Loading your workspace…</div></div><noscript>This dashboard requires JavaScript.</noscript></main>
+<dialog id="detail"><div id="detail-content"></div></dialog><div id="toast" role="status"></div>
+</body>
+</html>

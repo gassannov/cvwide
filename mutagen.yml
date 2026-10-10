@@ -1,0 +1,13 @@
+sync:
+  code:
+    alpha: .
+    beta: worksquad:/srv/worksquad/projects/cvwide/workspace
+    mode: one-way-replica
+    ignore:
+      paths: [.git, .local, /data, node_modules, .DS_Store]
+  data:
+    alpha: worksquad:/srv/worksquad/projects/cvwide/data
+    beta: ./data
+    mode: one-way-replica
+    ignore:
+      paths: ["*.tmp"]

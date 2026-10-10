@@ -1,0 +1,8 @@
+/* Inter by Rasmus Andersson, SIL OFL 1.1. Bundled locally; see fonts/OFL.txt. */
+@font-face {
+  font-family: 'Inter Variable';
+  src: url('/assets/fonts/InterVariable.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}

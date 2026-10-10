@@ -1,0 +1,12 @@
+.git
+data
+output
+.local
+node_modules
+*.bak
+public/data/seed.json
+public/assets/*.pdf
+public/assets/*.html
+public/assets/*.json
+public/assets/*.md
+public/assets/*.txt

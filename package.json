@@ -1,0 +1,14 @@
+{
+  "name": "cvwide",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/start.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "import:maratik": "python3 scripts/import_maratik.py"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

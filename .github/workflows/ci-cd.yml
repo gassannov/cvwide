@@ -1,0 +1,53 @@
+name: CV Wide CI/CD
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cvwide-production
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/ci-fixtures.mjs
+      - run: npm test
+        env:
+          CVWIDE_SYNTHETIC_TESTS: '1'
+      - run: |
+          for file in *.mjs public/*.js scripts/*.mjs; do node --check "$file"; done
+          bash -n deploy/activate.sh
+      - run: docker build -t cvwide-ci .
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.WORKSQUAD_SSH_PRIVATE_KEY }}
+      - name: Configure trusted host
+        env:
+          KNOWN_HOSTS: ${{ secrets.WORKSQUAD_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+      - name: Deploy exact main revision
+        env:
+          DEPLOY_HOST: ${{ secrets.WORKSQUAD_HOST }}
+          DEPLOY_USER: ${{ secrets.WORKSQUAD_USER }}
+          RELEASE: ${{ github.sha }}
+        run: |
+          git archive --format=tar.gz --output="/tmp/cvwide-$RELEASE.tar.gz" "$RELEASE"
+          scp "/tmp/cvwide-$RELEASE.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:/tmp/cvwide-$RELEASE.tar.gz"
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "sudo bash -s -- '$RELEASE'" < deploy/activate.sh

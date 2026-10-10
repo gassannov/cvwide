@@ -1,0 +1,48 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+import {importCollection} from '../collections.mjs';
+import {rubric,validateAssessment} from '../assessments.mjs';
+test('opportunity view filters groups and exposes collected grades and provenance',async()=>{
+ const seed=JSON.parse(await readFile('public/data/seed.json','utf8'));
+ const source={company:'Test employer',title:'ML Engineer',description:'Production ML',review:'Test judgment',preference_grade:8,technical_fit_grade:9,seniority_fit_grade:7,collection_origin:'Public expansion',sources:[{url:'https://example.com/ui-test-job'}]};
+ const snapshot=importCollection(seed,{collection:{id:'ui-test-group',label:'LinkedIn collection',source:'LinkedIn + employers',collectedAt:'2026-10-10'},jobs:[{company:source.company,role:source.title,url:source.sources[0].url,description:source.description,fit:source.review,location:'Paris',salary:'Unknown',channel:'Source posting',contact:'',research:source}]}).state;
+ snapshot.jobs.at(-1).assessment=validateAssessment({rubricVersion:rubric.version,criteria:Object.fromEntries(rubric.criteria.map(c=>[c.id,{score:8,reason:'Test rationale'}])),evaluatedAt:'2026-10-10T10:00:00Z',basis:'Test CV and role',sourceRefs:[source.sources[0].url],unknowns:['Eligibility unknown']});
+ const nodes=new Map();const node=key=>{if(!nodes.has(key))nodes.set(key,{innerHTML:'',textContent:'',attributes:{},setAttribute(key,value){this.attributes[key]=value;},removeAttribute(key){delete this.attributes[key];},classList:{add(){},remove(){},toggle(){}},addEventListener(){},showModal(){this.open=true;},close(){this.open=false;}});return nodes.get(key);};
+ const context=vm.createContext({assert,snapshot,nodes,node,console,setTimeout,setInterval:()=>0,Date,URL,location:{hash:'#applications'},window:{addEventListener(){}},document:{documentElement:{dataset:{}},body:{dataset:{}},querySelector:node,querySelectorAll:selector=>selector==='[data-process-id]'?(nodes.get('processDetails')||[]):[]},localStorage:{getItem:()=>null},fetch:async url=>({ok:true,json:async()=>url==='/api/state'?snapshot:url==='/data/scoring-rubric.json'?rubric:{sessions:[]}})});
+ const code=await readFile('public/app.js','utf8');
+ await new vm.Script('(async()=>{'+code+`
+ assert.equal(document.documentElement.dataset.theme,'light');
+ assert.equal(document.body.dataset.view,'applications');
+ assert.equal(node('#theme-toggle').attributes['aria-label'],'Switch to dark appearance');
+ assert.match(node('#content').innerHTML,/Filter by collection/);
+ assert.match(node('#content').innerHTML,/12/);
+ collectionFilter='ui-test-group';renderResults();assert.equal(node('#result-count').textContent,'1 opportunities');
+ assert.ok(node('#results').innerHTML.includes('8.0/10'));
+ assert.ok(node('#results').innerHTML.includes('ОЦЕНКА / 10'));
+ assert.match(node('#results').innerHTML,/ui-test-group/);
+ openJob(snapshot.jobs.at(-1).id);assert.ok(node('#detail-content').innerHTML.includes('Оценка вакансии: 8/10'));
+ assert.ok(node('#detail-content').innerHTML.includes('35%'));
+ assert.ok(node('#detail-content').innerHTML.includes('Test rationale'));
+ assert.match(node('#detail-content').innerHTML,/No application sent/);
+ assert.match(node('#detail-content').innerHTML,/Public expansion/);
+ assert.match(node('#detail-content').innerHTML,/ui-test-group/);
+ collectionFilter='';query='ui-test-group';renderResults();assert.equal(filtered().length,1);
+ query='';renderResults();assert.equal(filtered()[0].id,snapshot.jobs.at(-1).id);
+ assert.ok(node('#results').innerHTML.includes('Не оценена'));
+ const chatMarkup=chat();assert.ok(chatMarkup.includes('<h1 class="sr-only">Career copilot</h1>'));assert.match(chatMarkup,/id="new-chat"/);assert.match(chatMarkup,/id="chat-input"/);assert.match(chatMarkup,/Read-only assistance/);
+ applyTheme('dark');assert.equal(document.documentElement.dataset.theme,'dark');assert.equal(node('#theme-toggle').attributes['aria-label'],'Switch to light appearance');
+ assert.equal(snapshot.revision,state.revision);
+ view='chat';currentChat=null;paintChat();assert.match(node('#chat-messages').innerHTML,/What’s your next move/);assert.equal((node('#chat-messages').innerHTML.match(/data-prompt=/g)||[]).length,3);
+ assert.match(messageHTML('<script>unsafe</script> **career** [Source](https://example.com)'),/&lt;script&gt;/);
+ assert.equal(messageHTML('**career**'),'<strong>career</strong>');
+ currentChat={id:'test-chat',status:'idle',messages:[{id:'prompt-1',role:'user',text:'Read my workspace'},{id:'reply-1',role:'assistant',text:'Here is the answer'}],turns:[{id:'prompt-1',status:'idle',entries:[{id:'command-1',label:'Run command',status:'completed',at:'2026-10-10T10:00:00Z',detail:'cat source.json <script>unsafe</script>'}]}]};
+ const toggleLabel={innerHTML:''};const processDetails={dataset:{processId:'test-chat:prompt-1'},open:true,querySelector:()=>toggleLabel};nodes.set('processDetails',[processDetails]);
+ paintChat();assert.match(node('#chat-messages').innerHTML,/Hide process/);assert.match(node('#chat-messages').innerHTML,/data-process-id="test-chat:prompt-1" open/);assert.match(node('#chat-messages').innerHTML,/&lt;script&gt;/);assert.match(node('#chat-messages').innerHTML,/Here is the answer/);
+ processDetails.open=false;processDetails.ontoggle();paintChat();assert.ok(hiddenProcesses.has('test-chat:prompt-1'));assert.match(node('#chat-messages').innerHTML,/Show process/);assert.doesNotMatch(node('#chat-messages').innerHTML,/data-process-id="test-chat:prompt-1" open/);
+ currentChat.turns[0].entries.push({id:'tool-2',label:'Call tool',status:'completed',at:'2026-10-10T10:00:01Z',detail:'lookup result'});paintChat();assert.match(node('#chat-messages').innerHTML,/Show process/);assert.match(node('#chat-messages').innerHTML,/2 steps/);
+ processDetails.open=true;processDetails.ontoggle();paintChat();assert.match(node('#chat-messages').innerHTML,/Hide process/);
+ 
+ })()`).runInContext(context);
+});

@@ -1,0 +1,11 @@
+node_modules/
+/data/
+/output/
+/.local/
+.DS_Store
+*.bak
+public/data/seed.json
+public/assets/*
+!public/assets/fonts/
+!public/assets/icons/
+!public/assets/*.css
