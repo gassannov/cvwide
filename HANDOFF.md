@@ -1,3 +1,9 @@
+## Full Codex chat preparation — 12 October 2026
+
+- Chat runtime now requests full server-container access without approval prompts, loads the server account's Codex configuration, and works in the persistent `/workspace` code mirror. The task prompt allows file and network work, keeps source evidence untrusted, and directs tracking edits through `scripts/update-job.mjs` and the revision-checked API. It does not grant Mac native-browser or Telegram access.
+- Chat replies now render headings, lists and fenced code safely. New and saved token-usage blocks display on one line; raw transcript data is preserved.
+- Temporary-directory tests cover the Codex flags and authenticated API helper. A direct production-container smoke before release exposed missing `codex-code-mode-host`; Compose now mounts the matching host binary and activation checks that it exists. A disposable container with the new mounts executed `printf CVWIDE_FULL_MODE_READY` via Code Mode and confirmed `/workspace` is writable (both exit code 0). Public deployment and post-release real Codex execution have not yet been performed.
+
 ## CV Wide server migration — 11 October 2026
 
 Requested: Worksquad permanent runtime, `https://maratik.fun/cvwide/`, exact 26lockinnotes password UI and secret, private GitHub repository, code sync with Mutagen, shared server database usable from both interfaces, server Codex. No offline writes or scheduled backup service. Implementation: password access gate and prefix routing, Node 22 Docker runtime, guarded CI/CD with rollback, SSH local proxy, two one-way synchronization sessions. All original personal files retained outside Git. Existing chat transcripts are kept; imported local thread IDs are historical and not resumed on the server.

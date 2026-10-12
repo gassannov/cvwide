@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
 const args=process.argv.slice(2);let prompt='';for await(const chunk of process.stdin)prompt+=chunk;
-assert(args.includes('sandbox_mode="read-only"'));assert(args.includes('approval_policy="never"'));assert(args.includes('--ignore-user-config'));
+assert(args.includes('--dangerously-bypass-approvals-and-sandbox'));assert(!args.includes('--ignore-user-config'));
+assert(!prompt.includes('read-only project access'));assert(prompt.includes('scripts/update-job.mjs'));
 assert(prompt.includes('Complete current database'));assert(prompt.includes('"jobs":['));assert(prompt.includes('profile'));assert(prompt.includes('assets'));assert(prompt.includes('coverLetter'));
 const event=value=>process.stdout.write(JSON.stringify(value)+'\n');
 if(!args.includes('resume'))event({type:'thread.started',thread_id:'fake-thread-123'});else assert.equal(args[args.indexOf('resume')+1],'fake-thread-123');

@@ -6,13 +6,17 @@ services:
     init: true
     network_mode: host
     env_file: /srv/worksquad/projects/cvwide/secrets/app.env
+    environment:
+      CVWIDE_CODEX_CWD: /workspace
     volumes:
       - /srv/worksquad/projects/cvwide/data:/data
+      - /srv/worksquad/projects/cvwide/workspace:/workspace
       - /srv/worksquad/projects/cvwide/data:/app/data:ro
       - /srv/worksquad/projects/cvwide/workspace/output:/app/output:ro
       - ./runtime-assets:/app/public/assets:ro
       - /srv/worksquad/projects/cvwide/seed.json:/app/public/data/seed.json:ro
       - /home/maratik/.local/bin/codex:/usr/local/bin/codex:ro
+      - /home/maratik/.codex/packages/standalone/current/bin/codex-code-mode-host:/usr/local/bin/codex-code-mode-host:ro
       - /home/maratik/.codex:/home/maratik/.codex
     healthcheck:
       test: [CMD, node, -e, "fetch('http://127.0.0.1:4312/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]

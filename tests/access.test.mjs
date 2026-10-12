@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
 import vm from 'node:vm';
+import {updateJob} from '../scripts/update-job.mjs';
 test('password protects every private route, prefix assets work and revisions remain enforced',async()=>{
  const dir=await mkdtemp(path.join(os.tmpdir(),'cvwide-access-'));
  const child=spawn(process.execPath,['server.mjs'],{env:{...process.env,PORT:'0',CVWIDE_DATA_DIR:dir,NOTES_PASSWORD:'1234',CVWIDE_BASE_PATH:'/cvwide',CVWIDE_PUBLIC_ORIGIN:'https://maratik.fun'},stdio:['ignore','pipe','pipe']});
@@ -32,6 +33,11 @@ test('password protects every private route, prefix assets work and revisions re
   new vm.Script(await(await fetch(prefix+'/login.js')).text()).runInContext(context);
   await handlers.submit({preventDefault(){}});assert.match(written,/Career copilot/);assert.equal(error.textContent,'');
   assert.equal((await fetch(prefix+'/api/jobs/'+state.jobs[0].id,{method:'PATCH',headers:{...headers,...auth},body:JSON.stringify({revision:state.revision-1,notes:'stale'})})).status,409);
+  const updated=await updateJob({base:prefix+'/',password:'1234',id:state.jobs[0].id,changes:{notes:'Updated through tracking API'}});
+  assert.equal(updated.changed,true);assert.equal(updated.revision,state.revision+1);assert.equal(updated.notes,'Updated through tracking API');
+  const unchanged=await updateJob({base:prefix+'/',password:'1234',id:state.jobs[0].id,changes:{notes:'Updated through tracking API'}});
+  assert.equal(unchanged.changed,false);assert.equal(unchanged.revision,updated.revision);assert.equal(unchanged.history,null);
+  assert.equal((await(await fetch(prefix+'/api/state',{headers:auth})).json()).jobs[0].notes,'Updated through tracking API');
   const publicWrite=await new Promise((resolve,reject)=>{const req=http.request(prefix+'/api/session',{method:'POST',headers:{Host:'maratik.fun','Content-Type':'application/json'}},res=>{res.resume();resolve(res.statusCode);});req.on('error',reject);req.end('{"password":"1234"}');});assert.equal(publicWrite,403);
   const wrong=await fetch(prefix+'/api/session',{method:'POST',headers,body:'{"password":"0000"}'});assert.equal(wrong.status,401);
   assert.equal((await fetch(prefix+'/api/session',{method:'POST',headers,body:'{"password":"1234"}'})).status,429);

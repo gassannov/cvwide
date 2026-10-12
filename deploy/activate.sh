@@ -12,6 +12,7 @@ rm -f "/tmp/cvwide-$release.tar.gz"
 test -r "$app_root/secrets/app.env"
 test -s "$app_root/data/state.json"
 test -s "$app_root/seed.json"
+test -x /home/maratik/.codex/packages/standalone/current/bin/codex-code-mode-host
 mkdir -p "$release_dir/runtime-assets"
 cp -a "$app_root/private-assets/." "$release_dir/runtime-assets/"
 cp -a "$release_dir/public/assets/." "$release_dir/runtime-assets/"

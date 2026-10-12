@@ -11,6 +11,8 @@ test('public process items update in place, expose tool details and clip large o
  assert.match(turn.entries[1].detail,/KitIngen/);assert.match(turn.entries[1].detail,/Found/);
  recordProcess(turn,{type:'item.completed',item:{id:'reason',type:'reasoning',text:'PRIVATE REASONING',encrypted_content:'ENCRYPTED'}});
  assert.doesNotMatch(JSON.stringify(turn),/PRIVATE REASONING|ENCRYPTED/);
+ recordProcess(turn,{type:'item.completed',item:{id:'answer',type:'agent_message',text:'The final reply'}});
+ assert.doesNotMatch(JSON.stringify(turn),/The final reply/);
  recordProcess(turn,{type:'turn.completed',usage:{input_tokens:123,output_tokens:45}});
- assert.match(turn.entries.at(-1).detail,/123/);
+ assert.equal(turn.entries.at(-1).detail,'usage: Input: 123 · Output: 45');
 });

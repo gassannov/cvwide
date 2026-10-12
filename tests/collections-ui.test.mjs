@@ -31,17 +31,20 @@ test('opportunity view filters groups and exposes collected grades and provenanc
  collectionFilter='';query='ui-test-group';renderResults();assert.equal(filtered().length,1);
  query='';renderResults();assert.equal(filtered()[0].id,snapshot.jobs.at(-1).id);
  assert.ok(node('#results').innerHTML.includes('Не оценена'));
- const chatMarkup=chat();assert.ok(chatMarkup.includes('<h1 class="sr-only">Career copilot</h1>'));assert.match(chatMarkup,/id="new-chat"/);assert.match(chatMarkup,/id="chat-input"/);assert.match(chatMarkup,/Read-only assistance/);
+ const chatMarkup=chat();assert.ok(chatMarkup.includes('<h1 class="sr-only">Career copilot</h1>'));assert.match(chatMarkup,/id="new-chat"/);assert.match(chatMarkup,/id="chat-input"/);assert.match(chatMarkup,/Full Codex access on this server/);
+ const fence=String.fromCharCode(96).repeat(3);const formatted=messageHTML(['## Result','','- **Done**','- [Source](https://example.com/item)','',fence+'js','<script>unsafe</script>',fence].join(String.fromCharCode(10)));
+ assert.ok(formatted.includes('<h2>Result</h2>'));assert.ok(formatted.includes('<ul><li><strong>Done</strong></li>'));assert.ok(formatted.includes('<pre><code class="language-js">&lt;script&gt;unsafe&lt;/script&gt;</code></pre>'));
  applyTheme('dark');assert.equal(document.documentElement.dataset.theme,'dark');assert.equal(node('#theme-toggle').attributes['aria-label'],'Switch to light appearance');
  assert.equal(snapshot.revision,state.revision);
  view='chat';currentChat=null;paintChat();assert.match(node('#chat-messages').innerHTML,/What’s your next move/);assert.equal((node('#chat-messages').innerHTML.match(/data-prompt=/g)||[]).length,3);
  assert.match(messageHTML('<script>unsafe</script> **career** [Source](https://example.com)'),/&lt;script&gt;/);
- assert.equal(messageHTML('**career**'),'<strong>career</strong>');
+ assert.equal(messageHTML('**career**'),'<p><strong>career</strong></p>');
  currentChat={id:'test-chat',status:'idle',messages:[{id:'prompt-1',role:'user',text:'Read my workspace'},{id:'reply-1',role:'assistant',text:'Here is the answer'}],turns:[{id:'prompt-1',status:'idle',entries:[{id:'command-1',label:'Run command',status:'completed',at:'2026-10-10T10:00:00Z',detail:'cat source.json <script>unsafe</script>'}]}]};
  const toggleLabel={innerHTML:''};const processDetails={dataset:{processId:'test-chat:prompt-1'},open:true,querySelector:()=>toggleLabel};nodes.set('processDetails',[processDetails]);
  paintChat();assert.match(node('#chat-messages').innerHTML,/Hide process/);assert.match(node('#chat-messages').innerHTML,/data-process-id="test-chat:prompt-1" open/);assert.match(node('#chat-messages').innerHTML,/&lt;script&gt;/);assert.match(node('#chat-messages').innerHTML,/Here is the answer/);
  processDetails.open=false;processDetails.ontoggle();paintChat();assert.ok(hiddenProcesses.has('test-chat:prompt-1'));assert.match(node('#chat-messages').innerHTML,/Show process/);assert.doesNotMatch(node('#chat-messages').innerHTML,/data-process-id="test-chat:prompt-1" open/);
  currentChat.turns[0].entries.push({id:'tool-2',label:'Call tool',status:'completed',at:'2026-10-10T10:00:01Z',detail:'lookup result'});paintChat();assert.match(node('#chat-messages').innerHTML,/Show process/);assert.match(node('#chat-messages').innerHTML,/2 steps/);
+ assert.equal(processDetail({kind:'turn.completed',detail:'usage: {"input_tokens":351353,"output_tokens":342}'}),'usage: Input: 351,353 · Output: 342');
  processDetails.open=true;processDetails.ontoggle();paintChat();assert.match(node('#chat-messages').innerHTML,/Hide process/);
  
  })()`).runInContext(context);
