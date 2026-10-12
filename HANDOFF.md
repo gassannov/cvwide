@@ -1,5 +1,7 @@
 ## Full Codex chat release — 12 October 2026
 
+The follow-up Playwright fix mounts the existing Worksquad Playwright MCP and its runtime into the site container, including the writable cache needed for MCP initialization. A disposable container using production-equivalent mounts successfully called `browser_tabs` and saw the authorized Telegram Web tab; the prior production chat could list the MCP from config but failed to start it because the launcher and cache were absent. Activation and post-release checks are pending below.
+
 - Chat runtime now requests full server-container access without approval prompts, loads the server account's Codex configuration, and works in the persistent `/workspace` code mirror. The task prompt allows file and network work, keeps source evidence untrusted, and directs tracking edits through `scripts/update-job.mjs` and the revision-checked API. It does not grant Mac native-browser or Telegram access.
 - Chat replies now render headings, lists and fenced code safely. New and saved token-usage blocks display on one line; raw transcript data is preserved.
 - Temporary-directory tests cover the Codex flags and authenticated API helper. A direct production-container smoke before release exposed missing `codex-code-mode-host`; Compose now mounts the matching host binary and activation checks that it exists. A disposable container with the new mounts executed `printf CVWIDE_FULL_MODE_READY` via Code Mode and confirmed `/workspace` is writable (both exit code 0).

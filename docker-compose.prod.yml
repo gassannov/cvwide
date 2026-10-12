@@ -17,6 +17,11 @@ services:
       - /srv/worksquad/projects/cvwide/seed.json:/app/public/data/seed.json:ro
       - /home/maratik/.local/bin/codex:/usr/local/bin/codex:ro
       - /home/maratik/.codex/packages/standalone/current/bin/codex-code-mode-host:/usr/local/bin/codex-code-mode-host:ro
+      - /home/maratik/.local/bin/codex-playwright-mcp:/home/maratik/.local/bin/codex-playwright-mcp:ro
+      - /home/maratik/.local/share/codex-browser/node:/home/maratik/.local/share/codex-browser/node:ro
+      - /home/maratik/.local/share/codex-browser/node_modules:/home/maratik/.local/share/codex-browser/node_modules:ro
+      - /home/maratik/.local/share/codex-browser/output:/home/maratik/.local/share/codex-browser/output
+      - /home/maratik/.cache:/home/maratik/.cache
       - /home/maratik/.codex:/home/maratik/.codex
     healthcheck:
       test: [CMD, node, -e, "fetch('http://127.0.0.1:4312/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
