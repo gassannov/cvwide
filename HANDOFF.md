@@ -1,8 +1,9 @@
-## Full Codex chat preparation — 12 October 2026
+## Full Codex chat release — 12 October 2026
 
 - Chat runtime now requests full server-container access without approval prompts, loads the server account's Codex configuration, and works in the persistent `/workspace` code mirror. The task prompt allows file and network work, keeps source evidence untrusted, and directs tracking edits through `scripts/update-job.mjs` and the revision-checked API. It does not grant Mac native-browser or Telegram access.
 - Chat replies now render headings, lists and fenced code safely. New and saved token-usage blocks display on one line; raw transcript data is preserved.
-- Temporary-directory tests cover the Codex flags and authenticated API helper. A direct production-container smoke before release exposed missing `codex-code-mode-host`; Compose now mounts the matching host binary and activation checks that it exists. A disposable container with the new mounts executed `printf CVWIDE_FULL_MODE_READY` via Code Mode and confirmed `/workspace` is writable (both exit code 0). Public deployment and post-release real Codex execution have not yet been performed.
+- Temporary-directory tests cover the Codex flags and authenticated API helper. A direct production-container smoke before release exposed missing `codex-code-mode-host`; Compose now mounts the matching host binary and activation checks that it exists. A disposable container with the new mounts executed `printf CVWIDE_FULL_MODE_READY` via Code Mode and confirmed `/workspace` is writable (both exit code 0).
+- Release `23f86f212cffe43c40f24f6dfbc2d8121f5dfb7d` passed local 17/17 tests, syntax checks, Docker Compose validation and GitHub CI run 38283555178. It was manually activated on `https://maratik.fun/cvwide/` from the exact tested main SHA. Post-release checks: container healthy, public password page 200, unauthenticated private API 401, authenticated UI/API 200, state revision still 114, deployed Codex command exit 0, and isolated real chat pipeline completed with a saved thread, command log and reply. Native browser visual inspection was unavailable; no screenshot-level confirmation of the new Markdown rendering.
 
 ## CV Wide server migration — 11 October 2026
 
