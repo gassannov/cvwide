@@ -3,6 +3,7 @@
 This is a local personal job-search workspace. Read README.md for startup, data paths and source provenance. Keep changes focused and preserve user tracking data.
 
 - Never infer submission, delivery, interview, offer or rejection from a draft, attachment or an older partial session. Import final source evidence; retain historical/user-confirmed/unknown distinctions and exact source URLs.
+- For Gmail follow-ups, read the full decision email and match its employer and role to the tracked application before changing status. Keep acknowledgments and application views as Applied; record ambiguous multi-role invitations and role-name differences in notes with a message link.
 - Current career assets may postdate an application. Keep current PDF versions separate from historical transmitted materials; preserve hashes, qualifiers and unresolved career dates.
 - Source imports must never overwrite saved state. Changes to the state schema or seed require an explicit migration strategy preserving notes, statuses, history and follow-up dates.
 - Keep the server loopback-only. Do not publish personal reports, CV data or tracking state without explicit user authorization.
@@ -54,3 +55,9 @@ This is a local personal job-search workspace. Read README.md for startup, data 
 - When Codex chat depends on a host MCP, mount its launcher, runtime dependencies and writable cache/output into the container; verify an actual MCP tool call from the deployed CLI, not just `codex mcp list` or host browser availability.
 - Chat GET snapshots must share the persistence queue, so a published completed reply is already durable before an immediate restart. Require an observed successful CI validation result for the exact release SHA before executing a manual fallback deployment; launch jobs only after prerequisite checks finish.
 - When changing Codex execution mode, verify a real tool command inside the matching container with its configured companion binaries and persistent working directory. Full container access does not grant access to native Mac apps; tracking mutations still go through the revision-checked API, never direct JSON writes.
+
+- Before declaring application facts missing, read saved candidateFacts and later user clarifications; separate those facts from historical CV hashes. Verify input length limits and committed values before submission.
+- Pin one stable CDP target ID across every browser helper and follow-up; repeated URLs or tab positions do not identify the working tab. Validate the entire import manifest against observed source URLs and employer-specific metadata before importing; duplicate imports do not repair immutable fields.
+- For email applications, verify the completed PDF, Sent copy and recipient, then check for non-delivery reports. A Sent entry alone does not prove delivery; record a matching bounce and restore the appropriate unsubmitted status without erasing history.
+
+- Keep interactive PTY commands short: canonical input can truncate long UTF-8 payloads. Transfer application text/helpers as files, invoke them with short commands, and verify completion before retrying. Resume parsers can replace previously entered fields; recheck committed values after parsing finishes.
